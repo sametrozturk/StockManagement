@@ -1,16 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using StockManagement.Application.Common;
+using StockManagement.Domain.Common;
 
 namespace StockManagement.Persistence.Database;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext : DbContext, IUnitOfWork
 {
-
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-      : base(options)
-    {
-
-    }
+        : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -19,7 +15,9 @@ public class ApplicationDbContext : DbContext
         base.OnModelCreating(modelBuilder);
     }
 
-    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+    public override async Task<int> SaveChangesAsync(
+        CancellationToken cancellationToken = new CancellationToken()
+    )
     {
         var result = await base.SaveChangesAsync(cancellationToken);
 

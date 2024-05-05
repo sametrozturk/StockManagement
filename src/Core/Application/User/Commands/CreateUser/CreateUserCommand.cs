@@ -8,5 +8,5 @@ public sealed record CreateUserCommand(
     string LastName,
     string Email,
     string Password,
-    string Mobile,
-    string PhoneCountryCode) : IRequest<Unit>;
+    string PhoneNumber,
+    short PhoneCountryCode) : IRequest<Unit>;
