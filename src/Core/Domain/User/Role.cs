@@ -2,4 +2,4 @@
 
 namespace StockManagement.Domain.User;
 
-public class User : IdentityUser<Guid>;
+public class Role : IdentityRole<Guid>;

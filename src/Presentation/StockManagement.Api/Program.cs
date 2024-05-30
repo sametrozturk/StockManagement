@@ -3,13 +3,16 @@ using StockManagement.Persistence;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using HealthChecks.UI.Client;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Routing;
+using StockManagement.Domain.User;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var config = builder.Configuration;
 
 builder.Services.AddHealthChecks()
-    .AddNpgSql(config.GetConnectionString("DefaultConnection")!);
+    .AddSqlServer(config.GetConnectionString("DefaultConnection")!);
 
 // Add services to the container.
 
@@ -33,10 +36,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapHealthChecks("/_health", new HealthCheckOptions
+app.MapHealthChecks("/", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
 });/*.RequireAuthorization();*/
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

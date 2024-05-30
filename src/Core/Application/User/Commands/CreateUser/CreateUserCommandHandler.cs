@@ -16,18 +16,6 @@ internal sealed class CreateUserCommandHandler : IRequestHandler<CreateUserComma
     public async Task<Unit> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
         var emailResult = Email.Create(request.Email);
-        ;
-
-        var user = new Domain.User.User(
-            Guid.NewGuid(),
-            emailResult.Value,
-            request.FirstName,
-            request.LastName,
-            request.PhoneNumber,
-            request.PhoneCountryCode
-        );
-
-
 
         return await Task.FromResult(Unit.Value);
     }

@@ -11,6 +11,8 @@ public sealed class NewUserCreatedDomainEventHandler
         CancellationToken cancellationToken
     ) {
     
+        // email yolla
+        // sms yolla
        throw new NotImplementedException();
     }
 }
