@@ -1,7 +1,9 @@
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Quartz;
 using Serilog;
 using StockManagement.Application;
+using StockManagement.Infrastructure.BackgroundJobs;
 using StockManagement.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +27,23 @@ builder.Services.AddSwaggerGen();
 // Service registration layer
 builder.Services.AddApplicationServices();
 builder.Services.AddPersistenceServices(config);
+
+builder.Services.AddQuartz(configure =>
+{
+    var jobKey = new JobKey(nameof(ProcessOutboxMessagesJob));
+
+    configure
+        .AddJob<ProcessOutboxMessagesJob>(jobKey)
+        .AddTrigger(
+            trigger =>
+                trigger.ForJob(jobKey)
+                    .WithSimpleSchedule(
+                        schedule =>
+                            schedule.WithIntervalInSeconds(100)
+                                .RepeatForever()));
+});
+
+builder.Services.AddQuartzHostedService();
 
 var app = builder.Build();
 

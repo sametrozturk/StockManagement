@@ -11,12 +11,36 @@ namespace StockManagement.Persistence.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.EnsureSchema(
-                name: "identity");
+            migrationBuilder.CreateTable(
+                name: "OutboxMessageConsumers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OutboxMessageConsumers", x => new { x.Id, x.Name });
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OutboxMessages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OccurredOnUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ProcessedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Error = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OutboxMessages", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Roles",
-                schema: "identity",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -31,7 +55,6 @@ namespace StockManagement.Persistence.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Users",
-                schema: "identity",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -57,7 +80,6 @@ namespace StockManagement.Persistence.Migrations
 
             migrationBuilder.CreateTable(
                 name: "RoleClaims",
-                schema: "identity",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -72,7 +94,6 @@ namespace StockManagement.Persistence.Migrations
                     table.ForeignKey(
                         name: "FK_RoleClaims_Roles_RoleId",
                         column: x => x.RoleId,
-                        principalSchema: "identity",
                         principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -80,7 +101,6 @@ namespace StockManagement.Persistence.Migrations
 
             migrationBuilder.CreateTable(
                 name: "UserClaims",
-                schema: "identity",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -95,7 +115,6 @@ namespace StockManagement.Persistence.Migrations
                     table.ForeignKey(
                         name: "FK_UserClaims_Users_UserId",
                         column: x => x.UserId,
-                        principalSchema: "identity",
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -103,7 +122,6 @@ namespace StockManagement.Persistence.Migrations
 
             migrationBuilder.CreateTable(
                 name: "UserLogins",
-                schema: "identity",
                 columns: table => new
                 {
                     LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -117,7 +135,6 @@ namespace StockManagement.Persistence.Migrations
                     table.ForeignKey(
                         name: "FK_UserLogins_Users_UserId",
                         column: x => x.UserId,
-                        principalSchema: "identity",
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -125,7 +142,6 @@ namespace StockManagement.Persistence.Migrations
 
             migrationBuilder.CreateTable(
                 name: "UserRoles",
-                schema: "identity",
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -137,14 +153,12 @@ namespace StockManagement.Persistence.Migrations
                     table.ForeignKey(
                         name: "FK_UserRoles_Roles_RoleId",
                         column: x => x.RoleId,
-                        principalSchema: "identity",
                         principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserRoles_Users_UserId",
                         column: x => x.UserId,
-                        principalSchema: "identity",
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -152,7 +166,6 @@ namespace StockManagement.Persistence.Migrations
 
             migrationBuilder.CreateTable(
                 name: "UserTokens",
-                schema: "identity",
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -166,7 +179,6 @@ namespace StockManagement.Persistence.Migrations
                     table.ForeignKey(
                         name: "FK_UserTokens_Users_UserId",
                         column: x => x.UserId,
-                        principalSchema: "identity",
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -174,13 +186,11 @@ namespace StockManagement.Persistence.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoleClaims_RoleId",
-                schema: "identity",
                 table: "RoleClaims",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
-                schema: "identity",
                 table: "Roles",
                 column: "NormalizedName",
                 unique: true,
@@ -188,31 +198,26 @@ namespace StockManagement.Persistence.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserClaims_UserId",
-                schema: "identity",
                 table: "UserClaims",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserLogins_UserId",
-                schema: "identity",
                 table: "UserLogins",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserRoles_RoleId",
-                schema: "identity",
                 table: "UserRoles",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
-                schema: "identity",
                 table: "Users",
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
-                schema: "identity",
                 table: "Users",
                 column: "NormalizedUserName",
                 unique: true,
@@ -223,32 +228,31 @@ namespace StockManagement.Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "RoleClaims",
-                schema: "identity");
+                name: "OutboxMessageConsumers");
 
             migrationBuilder.DropTable(
-                name: "UserClaims",
-                schema: "identity");
+                name: "OutboxMessages");
 
             migrationBuilder.DropTable(
-                name: "UserLogins",
-                schema: "identity");
+                name: "RoleClaims");
 
             migrationBuilder.DropTable(
-                name: "UserRoles",
-                schema: "identity");
+                name: "UserClaims");
 
             migrationBuilder.DropTable(
-                name: "UserTokens",
-                schema: "identity");
+                name: "UserLogins");
 
             migrationBuilder.DropTable(
-                name: "Roles",
-                schema: "identity");
+                name: "UserRoles");
 
             migrationBuilder.DropTable(
-                name: "Users",
-                schema: "identity");
+                name: "UserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }

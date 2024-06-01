@@ -1,31 +1,28 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+﻿using Gatherly.Persistence.Outbox;
 using Microsoft.EntityFrameworkCore;
-using StockManagement.Domain.Common;
-using StockManagement.Domain.Repositories;
-using StockManagement.Persistence.Outbox;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Newtonsoft.Json;
+using StockManagement.Domain.Common;
+using StockManagement.Persistence.Outbox;
 
-namespace StockManagement.Persistence.Database;
+namespace StockManagement.Persistence.Interceptors;
 
-internal sealed class UnitOfWork : IUnitOfWork
+public sealed class ConvertDomainEventsToOutboxMessagesInterceptor
+     : SaveChangesInterceptor
 {
-    private readonly ApplicationDbContext _dbContext;
-
-    public UnitOfWork(ApplicationDbContext dbContext)
+    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
+        DbContextEventData eventData,
+        InterceptionResult<int> result,
+        CancellationToken cancellationToken = default)
     {
-        _dbContext = dbContext;
-    }
+        DbContext? dbContext = eventData.Context;
 
-    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        ConvertDomainEventsToOutboxMessages();
+        if (dbContext is null)
+        {
+            return base.SavingChangesAsync(eventData, result, cancellationToken);
+        }
 
-        return _dbContext.SaveChangesAsync(cancellationToken);
-    }
-
-    private void ConvertDomainEventsToOutboxMessages()
-    {
-        var outboxMessages = _dbContext.ChangeTracker
+        var outboxMessages = dbContext.ChangeTracker
             .Entries<AggregateRoot>()
             .Select(x => x.Entity)
             .SelectMany(aggregateRoot =>
@@ -50,6 +47,8 @@ internal sealed class UnitOfWork : IUnitOfWork
             })
             .ToList();
 
-        _dbContext.Set<OutboxMessage>().AddRange(outboxMessages);
+        dbContext.Set<OutboxMessage>().AddRange(outboxMessages);
+
+        return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 }

@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StockManagement.Domain.Repositories;
-using StockManagement.Domain.User;
 using StockManagement.Persistence.Database;
 
 namespace StockManagement.Persistence;

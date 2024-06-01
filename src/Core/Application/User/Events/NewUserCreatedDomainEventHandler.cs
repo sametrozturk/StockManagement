@@ -1,7 +1,4 @@
-﻿using MediatR;
-using StockManagement.Domain.User.DomainEvents;
-
-namespace StockManagement.Application.User.Events;
+﻿namespace StockManagement.Application.User.Events;
 
 public sealed class NewUserCreatedDomainEventHandler;
 //    : INotificationHandler<NewUserCreatedDomainEvent>
@@ -10,7 +7,7 @@ public sealed class NewUserCreatedDomainEventHandler;
 //        NewUserCreatedDomainEvent notification,
 //        CancellationToken cancellationToken
 //    ) {
-    
+
 //        // email yolla
 //        // sms yolla
 //       throw new NotImplementedException();

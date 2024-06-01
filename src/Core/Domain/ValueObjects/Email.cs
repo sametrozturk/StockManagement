@@ -1,30 +1,29 @@
 ﻿using StockManagement.Domain.Common;
+using StockManagement.Domain.Errors;
 using StockManagement.Domain.Shared;
 
 namespace StockManagement.Domain.ValueObjects;
 
 public sealed class Email : ValueObject
 {
-    private Email(string value)
-    {
-        Value = value;
-    }
+    public const int MaxLength = 255;
 
-    public string Value { get; }
+    private Email(string value) => Value = value;
 
-    public static Result<Email> Create(string value)
-    {
-        try
-        {
-            var email = new System.Net.Mail.MailAddress(value);
+    public string Value { get; private set; }
 
-            return new Email(value);
-        }
-        catch (FormatException e)
-        {
-            return Result.Failure<Email>(new Error($"{e.Source}", $"{e.Message}"));
-        }
-    }
+    public static Result<Email> Create(string email) =>
+        Result.Create(email)
+            .Ensure(
+                e => !string.IsNullOrWhiteSpace(e),
+                DomainErrors.Email.Empty)
+            .Ensure(
+                e => e.Length <= MaxLength,
+                DomainErrors.Email.TooLong)
+            .Ensure(
+                e => e.Split('@').Length == 2,
+                DomainErrors.Email.InvalidFormat)
+            .Map(e => new Email(e));
 
     public override IEnumerable<object> GetAtomicValues()
     {
