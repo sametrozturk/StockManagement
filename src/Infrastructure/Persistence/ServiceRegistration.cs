@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StockManagement.Domain.Repositories;
 using StockManagement.Domain.User;
 using StockManagement.Persistence.Database;
 
@@ -14,19 +15,16 @@ public static class ServiceRegistration
         IConfiguration configuration
     )
     {
-        serviceCollection.AddDbContext<IdentityContext>(options =>
+        serviceCollection.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(
                 configuration.GetConnectionString("DefaultConnection"),
-                b => b.MigrationsAssembly(typeof(IdentityContext).Assembly.FullName)
+                b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)
             )
         );
 
         serviceCollection.AddAuthorization();
         serviceCollection.AddAuthentication();
 
-        serviceCollection
-            .AddIdentityCore<User>()
-            .AddEntityFrameworkStores<IdentityContext>()
-            .AddDefaultTokenProviders();
+        serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 }

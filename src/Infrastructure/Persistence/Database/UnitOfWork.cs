@@ -1,12 +1,12 @@
-﻿using StockManagement.Domain.Common;
+﻿using StockManagement.Domain.Repositories;
 
 namespace StockManagement.Persistence.Database;
 
 public sealed class UnitOfWork : IUnitOfWork
 {
-    private readonly IdentityContext _dbContext;
+    private readonly ApplicationDbContext _dbContext;
 
-    public UnitOfWork(IdentityContext dbContext)
+    public UnitOfWork(ApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
     }

@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using StockManagement.Domain.Common;
+using StockManagement.Domain.Repositories;
 using StockManagement.Domain.ValueObjects;
 
 namespace StockManagement.Application.User.Commands.CreateUser;

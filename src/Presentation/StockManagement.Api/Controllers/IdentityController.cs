@@ -1,9 +1,5 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using StockManagement.Domain.User;
 
 namespace StockManagement.Api.Controllers
 {
@@ -11,13 +7,12 @@ namespace StockManagement.Api.Controllers
     [ApiController]
     public class IdentityController : ControllerBase
     {
-        public IdentityController() { }
+        private readonly IMediator _mediator;
 
-        [AllowAnonymous]
-        [HttpPost("register")]
-        public async Task<ActionResult> Register(string email, string password)
+        public IdentityController(IMediator mediator)
         {
-            return NoContent();
+            _mediator = mediator;
+
         }
     }
 }

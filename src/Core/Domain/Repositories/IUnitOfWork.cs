@@ -1,4 +1,4 @@
-﻿namespace StockManagement.Domain.Common;
+﻿namespace StockManagement.Domain.Repositories;
 
 public interface IUnitOfWork
 {

@@ -11,7 +11,7 @@ using StockManagement.Persistence.Database;
 
 namespace StockManagement.Persistence.Migrations
 {
-    [DbContext(typeof(IdentityContext))]
+    [DbContext(typeof(ApplicationDbContext))]
     [Migration("20240528163236_Initial")]
     partial class Initial
     {

@@ -1,15 +1,16 @@
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Serilog;
 using StockManagement.Application;
 using StockManagement.Persistence;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using HealthChecks.UI.Client;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Routing;
-using StockManagement.Domain.User;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var config = builder.Configuration;
+
+// Serilog
+builder.Host.UseSerilog((context, loggerConfig) =>
+    loggerConfig.ReadFrom.Configuration(context.Configuration));
 
 builder.Services.AddHealthChecks()
     .AddSqlServer(config.GetConnectionString("DefaultConnection")!);

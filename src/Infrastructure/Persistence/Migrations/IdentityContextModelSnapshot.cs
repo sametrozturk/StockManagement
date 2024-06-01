@@ -10,7 +10,7 @@ using StockManagement.Persistence.Database;
 
 namespace StockManagement.Persistence.Migrations
 {
-    [DbContext(typeof(IdentityContext))]
+    [DbContext(typeof(ApplicationDbContext))]
     partial class IdentityContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
