@@ -1,5 +1,6 @@
-﻿namespace StockManagement.Domain.Identity.DomainEvents;
+﻿
+using StockManagement.Domain.Common;
 
-public sealed record NewUserCreatedDomainEvent(Guid UserId)
-{
-}
+namespace StockManagement.Domain.Identity.DomainEvents;
+
+public sealed record NewUserCreatedDomainEvent(Guid UserId):  DomainEvent(UserId);

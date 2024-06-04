@@ -1,6 +1,6 @@
 ﻿namespace StockManagement.Domain.Common;
 
-public abstract class AggregateRoot : Entity
+public abstract class AggregateRoot : Entity, IAggregateRoot
 {
     private readonly List<IDomainEvent> _domainEvents = new();
 
@@ -13,5 +13,5 @@ public abstract class AggregateRoot : Entity
 
     public void ClearDomainEvents() => _domainEvents.Clear();
 
-    protected void RaiseDomainEvent(IDomainEvent domainEvent) => _domainEvents.Add(domainEvent);
+    public void RaiseDomainEvent(IDomainEvent domainEvent) => _domainEvents.Add(domainEvent);
 }

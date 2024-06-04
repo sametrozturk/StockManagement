@@ -1,9 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore;
+﻿using Newtonsoft.Json;
 using StockManagement.Domain.Common;
 using StockManagement.Domain.Repositories;
 using StockManagement.Persistence.Outbox;
-using Newtonsoft.Json;
 
 namespace StockManagement.Persistence.Database;
 
@@ -26,7 +24,7 @@ internal sealed class UnitOfWork : IUnitOfWork
     private void ConvertDomainEventsToOutboxMessages()
     {
         var outboxMessages = _dbContext.ChangeTracker
-            .Entries<AggregateRoot>()
+            .Entries<IAggregateRoot>()
             .Select(x => x.Entity)
             .SelectMany(aggregateRoot =>
             {

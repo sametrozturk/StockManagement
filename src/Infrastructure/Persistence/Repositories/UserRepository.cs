@@ -1,4 +1,5 @@
-﻿using StockManagement.Domain.Identity;
+﻿using Microsoft.EntityFrameworkCore;
+using StockManagement.Domain.Identity;
 using StockManagement.Domain.Repositories;
 using StockManagement.Domain.ValueObjects;
 using StockManagement.Persistence.Database;
@@ -12,28 +13,23 @@ public sealed class UserRepository : IUserRepository
     public UserRepository(ApplicationDbContext dbContext) =>
         _dbContext = dbContext;
 
-    public void Add(User member)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
+        await _dbContext
+            .Set<User>()
+            .FirstOrDefaultAsync(member => member.Id == id, cancellationToken);
 
-    public Task<User?> GetByEmailAsync(Email email, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default) =>
+        await _dbContext
+            .Set<User>()
+            .FirstOrDefaultAsync(member => member.Email == email, cancellationToken);
 
-    public Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<bool> IsEmailUniqueAsync(
+        string email,
+        CancellationToken cancellationToken = default) =>
+        !await _dbContext
+            .Set<User>()
+            .AnyAsync(member => member.Email == email, cancellationToken);
 
-    public Task<bool> IsEmailUniqueAsync(Email email, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Update(User member)
-    {
-        throw new NotImplementedException();
-    }
+    public void Update(User user) =>
+        _dbContext.Set<User>().Update(user);
 }
