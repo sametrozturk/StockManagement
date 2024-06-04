@@ -5,7 +5,6 @@ namespace StockManagement.Application;
 
 public static class ServiceRegistration
 {
-
     public static void AddApplicationServices(this IServiceCollection serviceCollection)
     {
         var ass = Assembly.GetExecutingAssembly();
