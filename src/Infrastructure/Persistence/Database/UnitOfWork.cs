@@ -16,38 +16,6 @@ internal sealed class UnitOfWork : IUnitOfWork
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        ConvertDomainEventsToOutboxMessages();
-
         return _dbContext.SaveChangesAsync(cancellationToken);
-    }
-
-    private void ConvertDomainEventsToOutboxMessages()
-    {
-        var outboxMessages = _dbContext.ChangeTracker
-            .Entries<IAggregateRoot>()
-            .Select(x => x.Entity)
-            .SelectMany(aggregateRoot =>
-            {
-                var domainEvents = aggregateRoot.GetDomainEvents();
-
-                aggregateRoot.ClearDomainEvents();
-
-                return domainEvents;
-            })
-            .Select(domainEvent => new OutboxMessage
-            {
-                Id = Guid.NewGuid(),
-                OccurredOnUtc = DateTime.UtcNow,
-                Type = domainEvent.GetType().Name,
-                Content = JsonConvert.SerializeObject(
-                    domainEvent,
-                    new JsonSerializerSettings
-                    {
-                        TypeNameHandling = TypeNameHandling.All
-                    })
-            })
-            .ToList();
-
-        _dbContext.Set<OutboxMessage>().AddRange(outboxMessages);
     }
 }

@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
 using StockManagement.Domain.Repositories;
-using StockManagement.Domain.ValueObjects;
 
 namespace StockManagement.Application.User.Commands.CreateUser;
 
@@ -9,14 +8,17 @@ internal sealed class CreateUserCommandHandler : IRequestHandler<CreateUserComma
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly UserManager<Domain.Identity.User> _userManager;
+    private readonly IUserRepository _userRepository;
 
     public CreateUserCommandHandler(
         IUnitOfWork unitOfWork,
-        UserManager<Domain.Identity.User> userManager
+        UserManager<Domain.Identity.User> userManager,
+        IUserRepository userRepository
     )
     {
         _unitOfWork = unitOfWork;
         _userManager = userManager;
+        _userRepository = userRepository;
     }
 
     public async Task<Unit> Handle(CreateUserCommand request, CancellationToken cancellationToken)
@@ -28,7 +30,19 @@ internal sealed class CreateUserCommandHandler : IRequestHandler<CreateUserComma
             request.Email
         );
 
+        bool isEmailUnique = await _userRepository.IsEmailUniqueAsync(request.Email, cancellationToken);
+
+        if (!isEmailUnique)
+        {
+
+        }
+
         var result = await _userManager.CreateAsync(user, request.Password);
+
+        if (!result.s)
+        {
+
+        }
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
