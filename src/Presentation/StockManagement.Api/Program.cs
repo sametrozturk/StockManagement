@@ -39,7 +39,7 @@ builder.Services.AddQuartz(configure =>
                 trigger.ForJob(jobKey)
                     .WithSimpleSchedule(
                         schedule =>
-                            schedule.WithIntervalInSeconds(100)
+                            schedule.WithIntervalInSeconds(50)
                                 .RepeatForever()));
 });
 
