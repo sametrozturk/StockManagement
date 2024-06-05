@@ -368,3 +368,6 @@ FodyWeavers.xsd
 # Appsetting.json
 appsettings.json
 appsettings.Development.json
+
+# Logs
+src/Presentation/StockManagement.Api/logs/
