@@ -1,27 +1,25 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Identity;
+using StockManagement.Domain.Errors;
 using StockManagement.Domain.Repositories;
+using StockManagement.Domain.Shared;
 
 namespace StockManagement.Application.User.Commands.CreateUser;
 
-internal sealed class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Unit>
+internal sealed class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Result<Guid>>
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly UserManager<Domain.Identity.User> _userManager;
     private readonly IUserRepository _userRepository;
 
     public CreateUserCommandHandler(
         IUnitOfWork unitOfWork,
-        UserManager<Domain.Identity.User> userManager,
         IUserRepository userRepository
     )
     {
         _unitOfWork = unitOfWork;
-        _userManager = userManager;
         _userRepository = userRepository;
     }
 
-    public async Task<Unit> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
         var user = Domain.Identity.User.CreateNew(
             request.FirstName,
@@ -34,18 +32,18 @@ internal sealed class CreateUserCommandHandler : IRequestHandler<CreateUserComma
 
         if (!isEmailUnique)
         {
-
+            return Result.Failure<Guid>(DomainErrors.User.EmailAlreadyInUse);
         }
 
-        var result = await _userManager.CreateAsync(user, request.Password);
+        var result = await _userRepository.Add(user, request.Password);
 
-        if (!result.s)
+        if (!result.IsSuccess)
         {
-
+            return Result.Failure<Guid>(new Error(result.Error.Code, result.Error.Message));
         }
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return await Task.FromResult(Unit.Value);
+        return user.Id;
     }
 }
