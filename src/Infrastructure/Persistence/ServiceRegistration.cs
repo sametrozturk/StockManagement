@@ -19,14 +19,19 @@ public static class ServiceRegistration
         IConfiguration configuration
     )
     {
-        serviceCollection.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(
-                configuration.GetConnectionString("DefaultConnection"),
-                b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)
-            )
-        );
+        serviceCollection.AddScoped<ConvertDomainEventsToOutboxMessagesInterceptor>();
 
-        serviceCollection.AddSingleton<ConvertDomainEventsToOutboxMessagesInterceptor>();
+        serviceCollection.AddDbContext<ApplicationDbContext>(
+            (sm, options) =>
+                options
+                    .UseSqlServer(
+                        configuration.GetConnectionString("DefaultConnection"),
+                        b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)
+                    )
+                    .AddInterceptors(
+                        sm.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>()
+                    )
+        );
 
         serviceCollection
             .AddIdentity<User, Role>()

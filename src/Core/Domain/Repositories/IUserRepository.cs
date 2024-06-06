@@ -13,7 +13,7 @@ public interface IUserRepository
 
     Task<bool> IsEmailUniqueAsync(string email, CancellationToken cancellationToken = default);
 
-    Task<Result<IdentityResult>> Add(User user, string password);
+    Task<IdentityResult> Add(User user, string password);
 
     void Update(User user);
 }

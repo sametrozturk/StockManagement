@@ -10,16 +10,16 @@ internal sealed class CreateUserCommandHandler : IRequestHandler<CreateUserComma
     private readonly IUnitOfWork _unitOfWork;
     private readonly IUserRepository _userRepository;
 
-    public CreateUserCommandHandler(
-        IUnitOfWork unitOfWork,
-        IUserRepository userRepository
-    )
+    public CreateUserCommandHandler(IUnitOfWork unitOfWork, IUserRepository userRepository)
     {
         _unitOfWork = unitOfWork;
         _userRepository = userRepository;
     }
 
-    public async Task<Result<Guid>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(
+        CreateUserCommand request,
+        CancellationToken cancellationToken
+    )
     {
         var user = Domain.Identity.User.CreateNew(
             request.FirstName,
@@ -28,7 +28,10 @@ internal sealed class CreateUserCommandHandler : IRequestHandler<CreateUserComma
             request.Email
         );
 
-        bool isEmailUnique = await _userRepository.IsEmailUniqueAsync(request.Email, cancellationToken);
+        bool isEmailUnique = await _userRepository.IsEmailUniqueAsync(
+            request.Email,
+            cancellationToken
+        );
 
         if (!isEmailUnique)
         {
@@ -37,12 +40,32 @@ internal sealed class CreateUserCommandHandler : IRequestHandler<CreateUserComma
 
         var result = await _userRepository.Add(user, request.Password);
 
-        if (!result.IsSuccess)
+        if (!result.Succeeded)
         {
-            return Result.Failure<Guid>(new Error(result.Error.Code, result.Error.Message));
+            var error = string.Join(";", result.Errors);
+            return Result.Failure<Guid>(new Error("User.UserCreationFailed", error));
         }
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        //using var transaction = _unitOfWork.BeginTransaction(
+        //    System.Data.IsolationLevel.ReadCommitted
+        //);
+
+        //try
+        //{
+        //    var result = await _userRepository.Add(user, request.Password);
+
+        //    if (!result.Succeeded)
+        //    {
+        //        var error = string.Join(";", result.Errors);
+        //        return Result.Failure<Guid>(DomainErrors.User.UserCreationFailed);
+        //    }
+
+        //    await _unitOfWork.SaveChangesAsync(cancellationToken);
+        //}
+        //catch (Exception ex)
+        //{
+        //    transaction.Rollback();
+        //}
 
         return user.Id;
     }

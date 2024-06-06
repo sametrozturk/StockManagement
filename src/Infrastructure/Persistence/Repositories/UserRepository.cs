@@ -36,7 +36,7 @@ public sealed class UserRepository : IUserRepository
         CancellationToken cancellationToken = default
     ) => !await _dbContext.Set<User>().AnyAsync(member => member.Email == email, cancellationToken);
 
-    public async Task<Result<IdentityResult>> Add(User user, string password)
+    public async Task<IdentityResult> Add(User user, string password)
     {
         return await _userManager.CreateAsync(user, password);
     }

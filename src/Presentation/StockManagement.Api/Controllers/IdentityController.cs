@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using StockManagement.Application.User.Commands.CreateUser;
 using StockManagement.Domain.Shared;
@@ -17,7 +16,7 @@ namespace StockManagement.Api.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost("CreateUser")]
+        [HttpPost("user")]
         public async Task<IActionResult> RegisterMember(
             [FromBody] CreateUserRequest request,
             CancellationToken cancellationToken
@@ -31,7 +30,14 @@ namespace StockManagement.Api.Controllers
                 request.PhoneNumber
             );
 
-            return Ok(await _mediator.Send(command, cancellationToken));
+            Result<Guid> result = await _mediator.Send(command, cancellationToken);
+
+            if (result.IsFailure)
+            {
+                return BadRequest(result.Error);
+            }
+
+            return Ok(result.Value);
         }
     }
 }

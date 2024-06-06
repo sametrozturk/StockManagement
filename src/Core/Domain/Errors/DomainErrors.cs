@@ -6,6 +6,10 @@ public static class DomainErrors
 {
     public static class User
     {
+        public static readonly Error UserCreationFailed = new(
+            "User.UserCreationFailed",
+            "User creation failed");
+
         public static readonly Error EmailAlreadyInUse = new(
             "User.EmailAlreadyInUse",
             "The specified email is already in use");

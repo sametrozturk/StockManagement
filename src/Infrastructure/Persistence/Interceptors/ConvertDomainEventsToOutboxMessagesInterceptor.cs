@@ -1,5 +1,4 @@
-﻿using Gatherly.Persistence.Outbox;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Newtonsoft.Json;
 using StockManagement.Domain.Common;
@@ -7,13 +6,13 @@ using StockManagement.Persistence.Outbox;
 
 namespace StockManagement.Persistence.Interceptors;
 
-public sealed class ConvertDomainEventsToOutboxMessagesInterceptor
-     : SaveChangesInterceptor
+public sealed class ConvertDomainEventsToOutboxMessagesInterceptor : SaveChangesInterceptor
 {
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,
         InterceptionResult<int> result,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         DbContext? dbContext = eventData.Context;
 
@@ -22,8 +21,8 @@ public sealed class ConvertDomainEventsToOutboxMessagesInterceptor
             return base.SavingChangesAsync(eventData, result, cancellationToken);
         }
 
-        var outboxMessages = dbContext.ChangeTracker
-            .Entries<AggregateRoot>()
+        var outboxMessages = dbContext
+            .ChangeTracker.Entries<IAggregateRoot>()
             .Select(x => x.Entity)
             .SelectMany(aggregateRoot =>
             {
@@ -40,10 +39,8 @@ public sealed class ConvertDomainEventsToOutboxMessagesInterceptor
                 Type = domainEvent.GetType().Name,
                 Content = JsonConvert.SerializeObject(
                     domainEvent,
-                    new JsonSerializerSettings
-                    {
-                        TypeNameHandling = TypeNameHandling.All
-                    })
+                    new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All }
+                )
             })
             .ToList();
 

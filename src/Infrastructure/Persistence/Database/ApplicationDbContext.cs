@@ -6,7 +6,7 @@ using StockManagement.Domain.Repositories;
 
 namespace StockManagement.Persistence.Database;
 
-public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>, IUnitOfWork
+public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
 {
 
 

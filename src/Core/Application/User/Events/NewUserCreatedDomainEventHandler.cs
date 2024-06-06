@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using MassTransit;
+using MediatR;
 using StockManagement.Domain.Identity.DomainEvents;
 using StockManagement.Domain.Repositories;
 
@@ -8,6 +9,7 @@ public sealed class NewUserCreatedDomainEventHandler
     : INotificationHandler<NewUserCreatedDomainEvent>
 {
     private readonly IUserRepository _userRepository;
+    private readonly IBus _bus;
 
     public NewUserCreatedDomainEventHandler(IUserRepository userRepository)
     {

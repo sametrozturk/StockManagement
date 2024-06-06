@@ -19,7 +19,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "https": {
+    "StockManagement.App": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
