@@ -5,6 +5,8 @@ using Serilog;
 using StockManagement.Application;
 using StockManagement.Infrastructure.BackgroundJobs;
 using StockManagement.Persistence;
+using NSwag;
+using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,11 +20,39 @@ builder.Services.AddHealthChecks()
     .AddSqlServer(config.GetConnectionString("DefaultConnection")!);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// Configure OpenAPI with NSwag
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddOpenApiDocument(configure =>
+{
+    configure.Title = "Stock Management API";
+    configure.Version = "v1";
+    configure.Description = "API documentation for Stock Management system";
+
+    configure.AddSecurity("JWT", new OpenApiSecurityScheme
+    {
+        Type = OpenApiSecuritySchemeType.ApiKey,
+        Name = "Authorization",
+        In = OpenApiSecurityApiKeyLocation.Header,
+        Description = "Type into the textbox: Bearer {your JWT token}."
+    });
+
+    configure.PostProcess = document =>
+    {
+        document.Info.Contact = new OpenApiContact
+        {
+            Name = "API Support",
+            Email = "support@stockmanagement.com",
+            Url = "https://www.stockmanagement.com/contact"
+        };
+        document.Info.License = new OpenApiLicense
+        {
+            Name = "MIT",
+            Url = "https://opensource.org/licenses/MIT"
+        };
+    };
+});
 
 // Service registration layer
 builder.Services.AddApplicationServices();
@@ -50,8 +80,13 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseOpenApi(); // OpenAPI belgesini oluþtur
+    app.UseSwaggerUI(settings =>
+    {
+        settings.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
+        settings.DocumentTitle = "My Custom API Documentation";
+    });
+
 }
 
 app.UseHttpsRedirection();
@@ -59,10 +94,9 @@ app.UseHttpsRedirection();
 app.MapHealthChecks("/", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
-});/*.RequireAuthorization();*/
+}); // Optional: .RequireAuthorization();
 
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 app.MapControllers();
